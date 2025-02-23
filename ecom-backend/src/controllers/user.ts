@@ -7,7 +7,7 @@ export const newUser=async(req:Request<{},{},NewUserRequestBody>,res:Response,ne
     try{
         const {name,email,photo,gender,_id,dob}=req.body;
        const user= await User.create({
-        name,email,photo,gender,_id,dob    
+        name,email,photo,gender,_id,dob:new Date(dob)    
         }
         )
         res.status(200).json({
