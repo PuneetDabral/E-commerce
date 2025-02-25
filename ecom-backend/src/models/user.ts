@@ -49,6 +49,8 @@ const userSchema = new mongoose.Schema({
   }
 },{
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
 });
 
 userSchema.virtual("age").get(function(){
