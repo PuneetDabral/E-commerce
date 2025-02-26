@@ -9,11 +9,8 @@ connectDB();
 const app = express();
 app.use(express.json());
 
-app.get('/',(req,res)=>{
-    res.send("Hello World")
-})
 
-app.use('/api', userRoute)
+app.use('/api/v1/user', userRoute)
 
 
 app.use(errorMiddleware)
