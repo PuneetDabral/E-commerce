@@ -1,6 +1,7 @@
 import express, { NextFunction } from "express"
 import {connectDB} from "./utils/features.js"
 import userRoute from "./routes/user.js"
+import productsRoute from "./routes/products.js"
 import { errorMiddleware } from "./middlewares/error.js";
 
 // routes import
@@ -11,6 +12,11 @@ app.use(express.json());
 
 
 app.use('/api/v1/user', userRoute)
+
+app.use('/api/v1/product',productsRoute)
+
+app.use("/uploads", express.static("uploads"));
+
 
 
 app.use(errorMiddleware)
