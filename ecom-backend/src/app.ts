@@ -2,20 +2,33 @@ import express, { NextFunction } from "express"
 import {connectDB} from "./utils/features.js"
 import userRoute from "./routes/user.js"
 import productsRoute from "./routes/products.js"
+import orderRoute from "./routes/order.js"
 import { errorMiddleware } from "./middlewares/error.js";
 import NodeCache from "node-cache";
+import {config} from "dotenv"
+import morgan from "morgan"
+
 
 // routes import
+config({
+    path:"./.env"
+})
 
-connectDB();
+const mongoURI=process.env.MONGO_URI || "";
+connectDB(mongoURI);
+
 export const myCache=new NodeCache({stdTTL: 100, checkperiod: 120});
+
 const app = express();
 app.use(express.json());
 
+app.use(morgan('dev'))
 
 app.use('/api/v1/user', userRoute)
 
 app.use('/api/v1/product',productsRoute)
+
+app.use('/api/v1/order',orderRoute)
 
 app.use("/uploads", express.static("uploads"));
 
@@ -23,6 +36,6 @@ app.use("/uploads", express.static("uploads"));
 
 app.use(errorMiddleware)
 
-app.listen(4000, () => {
+app.listen(process.env.PORT, () => {
     console.log("Server is running on port 4000")
 })
