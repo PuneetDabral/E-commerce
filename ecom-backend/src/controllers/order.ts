@@ -29,7 +29,7 @@ export const newOrder = TryCatch(
     ) {
       return next(new ErrorHandler("Please Enter All Fields", 400));
     }
-    await Order.create({
+   const order= await Order.create({
       shippingCharges,
       orderItems,
       user,
@@ -42,7 +42,7 @@ export const newOrder = TryCatch(
 
     await reduceStock(orderItems);
 
-    invalidateCache({ order: true, product: true, admin: true,userId:user });
+    invalidateCache({ order: true, product: true, admin: true,userId:user,productId:orderItems.map((i)=>String(i.productId)) });
 
     res.status(201).json({
       success: true,
