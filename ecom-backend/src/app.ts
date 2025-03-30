@@ -3,12 +3,13 @@ import {connectDB} from "./utils/features.js"
 import userRoute from "./routes/user.js"
 import productsRoute from "./routes/products.js"
 import orderRoute from "./routes/order.js"
-import paymentRoute from "./routes/payment.js"\
+import paymentRoute from "./routes/payment.js"
 import dashboardRoute from "./routes/stats.js"
 import { errorMiddleware } from "./middlewares/error.js";
 import NodeCache from "node-cache";
 import {config} from "dotenv"
 import morgan from "morgan"
+import Stripe from "stripe"
 
 
 // routes import
@@ -17,8 +18,10 @@ config({
 })
 
 const mongoURI=process.env.MONGO_URI || "";
+const stripeKey=process.env.STRIPE_KEY || "";
 connectDB(mongoURI);
 
+export const stripe=new Stripe(stripeKey)
 export const myCache=new NodeCache({stdTTL: 100, checkperiod: 120});
 
 const app = express();

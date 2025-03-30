@@ -56,6 +56,7 @@ const invalidateCache = async ({
     myCache.del(orderKeys);
   }
   if (admin) {
+    myCache.del(["admin-stats","admin-pie-charts","admin-bar-charts","admin-line-charts"])
   }
 };
 
@@ -78,19 +79,56 @@ const calculatePercentage = (thisMonth: number, lastMonth: number) => {
 };
 
 const getCategoryCount = async (categories: string[]) => {
-      const productsCount = await Product.countDocuments();
-      const categoriesCountPromise = categories.map((category) =>
-        Product.countDocuments({ category })
-      );
-      const categoriesCount = await Promise.all(categoriesCountPromise);
-      const categoryCount: Record<string, number>[] = [];
-      categories.forEach((category, i) => {
-        categoryCount.push({
-          [category]: Math.round((categoriesCount[i] / productsCount) * 100),
-        });
-      });
+  const productsCount = await Product.countDocuments();
+  const categoriesCountPromise = categories.map((category) =>
+    Product.countDocuments({ category })
+  );
+  const categoriesCount = await Promise.all(categoriesCountPromise);
+  const categoryCount: Record<string, number>[] = [];
+  categories.forEach((category, i) => {
+    categoryCount.push({
+      [category]: Math.round((categoriesCount[i] / productsCount) * 100),
+    });
+  });
 
-      return {categoryCount, categoriesCount,productsCount};
+  return { categoryCount, categoriesCount, productsCount };
+};
+
+interface MyDocument extends Document {
+  createdAt: Date;
+  discount?: number;
+  total?: number;
 }
 
-export { connectDB, invalidateCache, reduceStock, calculatePercentage,getCategoryCount };
+type FuncProps = {
+  length: number;
+  docArr: MyDocument[];
+  property?: "discount"|"total";
+};
+
+const getChartsData = ({ length, docArr, property }: FuncProps) => {
+  const today = new Date();
+  let data: number[] = new Array(length).fill(0);
+
+  docArr.forEach((order) => {
+    const creationDate = order.createdAt;
+    const monthDiff = (today.getMonth() - creationDate.getMonth() + 12) % 12;
+    if (monthDiff < length) {
+      if(property) {
+        data[length - monthDiff - 1] += order[property]! ;
+      }else{
+        data[length - monthDiff - 1] += 1;
+      }
+    }
+  });
+  return data;
+};
+
+export {
+  connectDB,
+  invalidateCache,
+  reduceStock,
+  calculatePercentage,
+  getCategoryCount,
+  getChartsData,
+};
